@@ -163,7 +163,7 @@ function main_menu() {
         echo "1. 安装并启动节点"
         echo "2. 连接 Bitcoin Core 并运行索引器"
         echo "3. 获取 Principal ID"
-        echo "4. 停止并删除脚本相关内容及脚本"
+        echo "4. 停止并删除节点"
         read -p "请输入选项 [1-4]: " option
         case $option in
             1)
