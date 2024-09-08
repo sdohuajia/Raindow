@@ -144,11 +144,11 @@ function cleanup_and_remove_script() {
     rm -rf /root/project/run_btc_testnet4
     rm -rf /root/rbo_indexer_testnet
 
-    echo "删除脚本文件..."
-    rm -- "$SCRIPT_PATH"
-
     echo "所有内容已删除，脚本将退出。"
     exit 0
+
+    read -n 1 -s -r -p "按任意键返回主菜单..."
+    main_menu
 }
 
 # 主菜单函数
