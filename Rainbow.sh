@@ -98,12 +98,12 @@ EOL
 
     if [ $? -ne 0 ]; then
         echo "Docker Compose 启动失败。请检查容器日志并处理错误。"
-        exit 1
+        return 1
     fi
 
     echo "所有步骤已完成。"
     read -n 1 -s -r -p "按任意键返回主菜单..."
-    main_menu
+    return 0
 }
 
 # 连接 Bitcoin Core 并运行索引器的函数
