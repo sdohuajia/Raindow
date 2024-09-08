@@ -119,6 +119,7 @@ function cleanup_and_remove_script() {
     echo "删除克隆的 GitHub 仓库..."
     rm -rf /root/project/run_btc_testnet4
     rm -rf /root/rbo_indexer_testnet
+    rm -rf /root/btc_testnet4
 
     echo "所有内容已删除，脚本将退出。"
     exit 0
