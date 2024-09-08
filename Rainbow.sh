@@ -137,7 +137,6 @@ EOL
 
     echo "所有步骤已完成。"
     read -n 1 -s -r -p "按任意键返回主菜单..."
-    return 0
 }
 
 # 连接 Bitcoin Core 并运行索引器的函数
