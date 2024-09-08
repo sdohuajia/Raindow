@@ -10,7 +10,7 @@ function install_and_start_node() {
 
     if [ $? -ne 0 ]; then
         echo "目录 $DIR 创建失败！"
-        exit 1
+        return 1
     fi
 
     echo "安装 Docker 和 Docker Compose..."
@@ -26,7 +26,7 @@ function install_and_start_node() {
 
     if [ $? -ne 0 ]; then
         echo "Docker 安装失败！"
-        exit 1
+        return 1
     fi
 
     echo "Docker 状态:"
@@ -46,17 +46,34 @@ function install_and_start_node() {
     git clone https://github.com/rainbowprotocol-xyz/btc_testnet4
     if [ $? -ne 0 ]; then
         echo "克隆仓库失败！"
-        exit 1
+        return 1
     fi
 
-    cd btc_testnet4 || { echo "进入目录失败！"; exit 1; }
+    cd btc_testnet4 || { echo "进入目录失败！"; return 1; }
 
     echo "启动 Docker 容器..."
     docker-compose up -d
 
     if [ $? -ne 0 ]; then
         echo "Docker Compose 启动失败。请检查容器日志并处理错误。"
-        exit 1
+        echo "获取容器 ID 和重新启动容器..."
+
+        echo "请运行以下命令来停止和删除出现错误的容器:"
+        echo "1. 查看正在运行的容器: docker ps"
+        echo "2. 复制出现错误的容器 ID 并运行: docker stop <容器 ID>"
+        echo "3. 运行: docker rm <容器 ID>"
+
+        read -p "请输入出现错误的容器 ID 并按 Enter 键: " CONTAINER_ID
+
+        echo "停止容器 $CONTAINER_ID..."
+        docker stop "$CONTAINER_ID"
+            
+        echo "删除容器 $CONTAINER_ID..."
+        docker rm "$CONTAINER_ID"
+
+        echo "处理完容器错误后，重新启动 Docker Compose:"
+        docker-compose up -d
+        return 1
     fi
 
     echo "进入 Docker 容器并创建钱包..."
@@ -93,34 +110,30 @@ EOL
 
     echo "完成配置，docker-compose.yml 文件已创建。"
 
-    # 启动 Docker Compose
     echo "启动 Docker Compose..."
     docker-compose up -d
 
-    # 检查 Docker Compose 启动状态
     if [ $? -ne 0 ]; then
-    echo "Docker Compose 启动失败。请检查容器日志并处理错误。"
-    echo "获取容器 ID 和重新启动容器..."
+        echo "Docker Compose 启动失败。请检查容器日志并处理错误。"
+        echo "获取容器 ID 和重新启动容器..."
 
-    # 提示用户获取容器 ID
-    echo "请运行以下命令来停止和删除出现错误的容器:"
-    echo "1. 查看正在运行的容器: docker ps"
-    echo "2. 复制出现错误的容器 ID 并运行: docker stop <容器 ID>"
-    echo "3. 运行: docker rm <容器 ID>"
+        echo "请运行以下命令来停止和删除出现错误的容器:"
+        echo "1. 查看正在运行的容器: docker ps"
+        echo "2. 复制出现错误的容器 ID 并运行: docker stop <容器 ID>"
+        echo "3. 运行: docker rm <容器 ID>"
 
-    # 提示用户输入容器 ID
-    read -p "请输入出现错误的容器 ID 并按 Enter 键: " CONTAINER_ID
+        read -p "请输入出现错误的容器 ID 并按 Enter 键: " CONTAINER_ID
 
-    # 停止和删除指定容器
-    echo "停止容器 $CONTAINER_ID..."
-    docker stop "$CONTAINER_ID"
-        
-    echo "删除容器 $CONTAINER_ID..."
-    docker rm "$CONTAINER_ID"
+        echo "停止容器 $CONTAINER_ID..."
+        docker stop "$CONTAINER_ID"
+            
+        echo "删除容器 $CONTAINER_ID..."
+        docker rm "$CONTAINER_ID"
 
-    # 提示用户重新启动 Docker Compose
-    echo "处理完容器错误后，重新启动 Docker Compose:"
-    docker-compose up -d
+        echo "处理完容器错误后，重新启动 Docker Compose:"
+        docker-compose up -d
+        return 1
+    fi
 
     echo "所有步骤已完成。"
     read -n 1 -s -r -p "按任意键返回主菜单..."
@@ -167,9 +180,6 @@ function cleanup_and_remove_script() {
 
     echo "所有内容已删除，脚本将退出。"
     exit 0
-
-    read -n 1 -s -r -p "按任意键返回主菜单..."
-    main_menu
 }
 
 # 主菜单函数
