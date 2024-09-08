@@ -93,13 +93,34 @@ EOL
 
     echo "完成配置，docker-compose.yml 文件已创建。"
 
+    # 启动 Docker Compose
     echo "启动 Docker Compose..."
     docker-compose up -d
 
+    # 检查 Docker Compose 启动状态
     if [ $? -ne 0 ]; then
-        echo "Docker Compose 启动失败。请检查容器日志并处理错误。"
-        return 1
-    fi
+    echo "Docker Compose 启动失败。请检查容器日志并处理错误。"
+    echo "获取容器 ID 和重新启动容器..."
+
+    # 提示用户获取容器 ID
+    echo "请运行以下命令来停止和删除出现错误的容器:"
+    echo "1. 查看正在运行的容器: docker ps"
+    echo "2. 复制出现错误的容器 ID 并运行: docker stop <容器 ID>"
+    echo "3. 运行: docker rm <容器 ID>"
+
+    # 提示用户输入容器 ID
+    read -p "请输入出现错误的容器 ID 并按 Enter 键: " CONTAINER_ID
+
+    # 停止和删除指定容器
+    echo "停止容器 $CONTAINER_ID..."
+    docker stop "$CONTAINER_ID"
+        
+    echo "删除容器 $CONTAINER_ID..."
+    docker rm "$CONTAINER_ID"
+
+    # 提示用户重新启动 Docker Compose
+    echo "处理完容器错误后，重新启动 Docker Compose:"
+    docker-compose up -d
 
     echo "所有步骤已完成。"
     read -n 1 -s -r -p "按任意键返回主菜单..."
