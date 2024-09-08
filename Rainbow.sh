@@ -66,23 +66,6 @@ function install_and_start_node() {
     echo "启动 Docker 容器..."
     docker-compose up -d
 
-    # 检查 Docker Compose 启动状态
-    if [ $? -ne 0 ]; then
-        echo "Docker Compose 启动失败。请检查容器日志并处理错误。"
-
-        # 提示用户处理容器错误后重新启动 Docker Compose
-        echo "处理完容器错误后，重新启动 Docker Compose:"
-        docker-compose up -d
-
-        # 提示用户按任意键返回主菜单
-        read -n 1 -s -r -p "按任意键返回主菜单..."
-        main_menu
-        exit 1
-    fi
-
-    # 进入克隆下来的目录
-    cd btc_testnet4 || { echo "进入目录失败！"; exit 1; }
-
     # 进入容器并执行 Bitcoin CLI 命令
     echo "进入 Docker 容器并创建钱包..."
     docker exec -it $(docker ps -q -f "name=bitcoind") /bin/bash -c "bitcoin-cli -testnet4 -rpcuser=demo -rpcpassword=demo -rpcport=5000 createwallet walletname"
