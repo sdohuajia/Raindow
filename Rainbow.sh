@@ -118,7 +118,7 @@ function connect_and_run_indexer() {
     main_menu
 }
 
-# Get your Principal ID的函数
+# 获取 Principal ID 的函数
 function edit_principal() {
     mkdir -p /root/rbo_indexer_testnet/identity
 
@@ -133,6 +133,24 @@ function edit_principal() {
     main_menu
 }
 
+# 停止并删除脚本相关内容的函数
+function cleanup_and_remove_script() {
+    echo "停止并删除脚本相关 Docker 容器..."
+
+    # 停止并删除 Docker 容器
+    docker-compose down
+
+    echo "删除克隆的 GitHub 仓库..."
+    rm -rf /root/project/run_btc_testnet4
+    rm -rf /root/rbo_indexer_testnet
+
+    echo "删除脚本文件..."
+    rm -- "$SCRIPT_PATH"
+
+    echo "所有内容已删除，脚本将退出。"
+    exit 0
+}
+
 # 主菜单函数
 function main_menu() {
     while true; do
@@ -145,7 +163,7 @@ function main_menu() {
         echo "1. 安装并启动节点"
         echo "2. 连接 Bitcoin Core 并运行索引器"
         echo "3. 获取 Principal ID"
-        echo "4. 退出"
+        echo "4. 停止并删除脚本相关内容及脚本"
         read -p "请输入选项 [1-4]: " option
         case $option in
             1)
@@ -158,8 +176,7 @@ function main_menu() {
                 edit_principal
                 ;;
             4)
-                echo "退出脚本。"
-                exit 0
+                cleanup_and_remove_script
                 ;;
             *)
                 echo "无效的选项，请选择 [1-4]"
