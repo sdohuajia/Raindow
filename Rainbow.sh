@@ -26,6 +26,9 @@ function install_and_start_node() {
         exit 1
     fi
 
+    # 安装Screen
+    sudo apt install -y screen
+    
     # 安装 Docker 和 Docker Compose
     echo "安装 Docker 和 Docker Compose..."
 
