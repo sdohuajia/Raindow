@@ -29,32 +29,35 @@ function install_and_start_node() {
     # 安装Screen
     sudo apt install -y screen
     
-    # 安装 Docker 和 Docker Compose
-    echo "安装 Docker 和 Docker Compose..."
+    # 检查是否已安装 Docker
+    if ! command -v docker &> /dev/null; then
+        echo "Docker 未安装，正在安装 Docker..."
 
-    # 安装 Docker
-    sudo apt-get update
-    sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    sudo apt-get update
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-    sudo systemctl start docker
-    sudo systemctl enable docker
+        # 安装 Docker 和依赖
+        sudo apt-get update
+        sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        sudo apt-get update
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+        sudo systemctl start docker
+        sudo systemctl enable docker
+    else
+        echo "Docker 已安装，跳过安装步骤。"
+    fi
 
-    # 验证 Docker 安装
+    # 验证 Docker 状态
     echo "Docker 状态:"
     sudo systemctl status docker --no-pager
 
-    # 检查 Docker Compose 是否安装
+    # 检查是否已安装 Docker Compose
     if ! command -v docker-compose &> /dev/null; then
         echo "Docker Compose 未安装，正在安装 Docker Compose..."
-        # 安装 Docker Compose
         DOCKER_COMPOSE_VERSION="2.20.2"
-        sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        chmod +x /usr/local/bin/docker-compose
+        sudo curl -L "https://github.com/docker/compose/releases/download/v$DOCKER_COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
     else
-        echo "Docker Compose 已安装。"
+        echo "Docker Compose 已安装，跳过安装步骤。"
     fi
 
     # 输出 Docker Compose 版本
