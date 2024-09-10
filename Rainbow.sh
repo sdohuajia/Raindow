@@ -166,7 +166,7 @@ function connect_and_run_indexer() {
     echo "连接 Bitcoin Core 并运行索引器..."
 
     screen -S Rainbow -dm
-    screen -S Rainbow -X stuff $'cd /root/rbo_indexer_testnet && ./rbo_worker worker --rpc http://127.0.0.1:5000 --password demo --username demo --start_height 42000\n'
+    screen -S Rainbow -X stuff $'cd /root/rbo_indexer_testnet && ./rbo_worker worker --rpc http://127.0.0.1:5000 --password demo --username demo --start_height 44236\n'
 
     echo "索引器正在运行。"
     read -n 1 -s -r -p "按任意键返回主菜单..."
