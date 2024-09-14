@@ -218,9 +218,15 @@ function update_script() {
     mkdir -p "$UPDATE_DIR/logs"
     echo "INDEXER_LOGGER_FILE=./logs/indexer" > "$UPDATE_DIR/.env"
 
-    # 启动 rbo_worker 进程
-    echo "启动 rbo_worker 进程..."
-    nohup "$UPDATE_DIR/rbo_worker" worker --rpc http://127.0.0.1:5000 --password demo --username demo --start_height 44938 --indexer_port 5050 > "$UPDATE_DIR/worker.log" 2>&1 &
+    # 启动新的 screen 会话
+    echo "启动新的 screen 会话..."
+    screen -S Rainbow -dm bash -c "
+        echo '在 screen 会话中运行 rbo_worker...'
+        cd $UPDATE_DIR
+        ./rbo_worker worker --rpc http://127.0.0.1:5000 --password demo --username demo --start_height 44938 --indexer_port 5050 > worker.log 2>&1 &
+        echo 'rbo_worker 进程已启动，日志输出到 $UPDATE_DIR/worker.log'
+        exec bash
+    "
 
     echo "rbo_worker 更新和启动完成。"
 
