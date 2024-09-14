@@ -161,33 +161,6 @@ EOL
     main_menu
 }
 
-# 连接 Bitcoin Core 并运行索引器的函数
-function connect_and_run_indexer() {
-    echo "连接 Bitcoin Core 并运行索引器..."
-
-    screen -S Rainbow -dm
-    screen -S Rainbow -X stuff $'cd /root/rbo_indexer_testnet && ./rbo_worker worker --rpc http://127.0.0.1:5000 --password demo --username demo --start_height 44938\n'
-
-    echo "索引器正在运行。"
-    read -n 1 -s -r -p "按任意键返回主菜单..."
-    main_menu
-}
-
-# 获取 Principal ID 的函数
-function edit_principal() {
-    mkdir -p /root/rbo_indexer_testnet/identity
-
-    if [ -f /root/rbo_indexer_testnet/identity/principal.json ]; then
-        echo "导出 principal.json 文件的内容..."
-        cat /root/rbo_indexer_testnet/identity/principal.json
-    else
-        echo "文件 /root/rbo_indexer_testnet/identity/principal.json 不存在。"
-    fi
-
-    read -n 1 -s -r -p "按任意键返回主菜单..."
-    main_menu
-}
-
 # 更新脚本的函数
 function update_script() {
     echo "正在更新 rbo_worker..."
@@ -282,33 +255,29 @@ function main_menu() {
         echo "退出脚本，请按键盘 ctrl + C 退出即可"
         echo "请选择要执行的操作:"
         echo "1. 安装并启动节点"
-        echo "2. 连接 Bitcoin Core 并运行索引器"
+        echo "2. 连接 Bitcoin Core 并运行索引器（更新脚本）"
         echo "3. 获取 Principal ID"
-        echo "4. 更新脚本"
-        echo "5. 停止并删除节点（请保存好钱包文件）"
-        echo "6. 查看 rbo_worker 日志"
-        read -p "请输入选项 [1-6]: " option
+        echo "4. 停止并删除节点（请保存好钱包文件）"
+        echo "5. 查看 rbo_worker 日志"
+        read -p "请输入选项 [1-5]: " option
         case $option in
             1)
                 install_and_start_node
                 ;;
             2)
-                connect_and_run_indexer
+                update_script
                 ;;
             3)
                 edit_principal
                 ;;
             4)
-                update_script
-                ;;
-            5)
                 cleanup_and_remove_script
                 ;;
-            6)
+            5)
                 view_logs
                 ;;
             *)
-                echo "无效的选项，请选择 [1-6]"
+                echo "无效的选项，请选择 [1-5]"
                 ;;
         esac
     done
