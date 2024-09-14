@@ -247,8 +247,8 @@ function view_logs() {
     fi
 
     # 查看日志
-    cd /root/rbo_indexer_testnet
-    tail -f worker.log
+    /root/rbo_indexer_testnet/logs
+    tail -f /root/rbo_indexer_testnet/logs/indexer
 }
 
 # 停止并删除脚本相关内容的函数
