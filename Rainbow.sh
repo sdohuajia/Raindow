@@ -193,8 +193,12 @@ function cleanup_and_remove_script() {
     echo "停止并删除脚本相关 Docker 容器..."
 
     # 停止并删除 Docker 容器
+    cd /root/btc_testnet4
     docker-compose down
 
+    cd /root/rbo_indexer_testnet
+    docker-compose down
+    
     echo "删除克隆的 GitHub 仓库..."
     rm -rf /root/project/run_btc_testnet4
     rm -rf /root/rbo_indexer_testnet
