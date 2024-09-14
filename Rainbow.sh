@@ -213,6 +213,11 @@ function update_script() {
     echo "清理临时文件..."
     rm /root/rbo_worker.tar.gz
 
+    # 创建 .env 文件并设置 INDEXER_LOGGER_FILE
+    echo "创建 .env 文件..."
+    mkdir -p "$UPDATE_DIR/logs"
+    echo "INDEXER_LOGGER_FILE=./logs/indexer" > "$UPDATE_DIR/.env"
+
     # 启动 rbo_worker 进程
     echo "启动 rbo_worker 进程..."
     nohup "$UPDATE_DIR/rbo_worker" worker --rpc http://127.0.0.1:5000 --password demo --username demo --start_height 44938 --indexer_port 5050 > "$UPDATE_DIR/worker.log" 2>&1 &
