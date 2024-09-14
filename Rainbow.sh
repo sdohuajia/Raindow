@@ -188,6 +188,45 @@ function edit_principal() {
     main_menu
 }
 
+# 更新脚本的函数
+function update_script() {
+    echo "正在更新 rbo_worker..."
+
+    # 重新启动 Rainbow 监控
+    echo "重新启动 Rainbow 监控..."
+    screen -S Rainbow -dm
+
+    # 下载最新版本的 rbo_worker
+    echo "下载最新版本的 rbo_worker..."
+    wget https://storage.googleapis.com/rbo/rbo_worker/rbo_worker-linux-amd64-0.0.2-20240914-4ec80a8.tar.gz
+
+    # 创建目录用于解压
+    UPDATE_DIR="/root/rbo_indexer_testnet"
+    echo "创建目录 $UPDATE_DIR..."
+    mkdir -p "$UPDATE_DIR"
+
+    # 解压下载的文件到创建的目录
+    echo "解压下载的文件..."
+    tar -xzvf rbo_worker-linux-amd64-0.0.2-20240914-4ec80a8.tar.gz -C "$UPDATE_DIR"
+
+    # 复制解压后的 rbo_worker 文件到 /root/rbo_indexer_testnet
+    echo "复制 rbo_worker 文件..."
+    cp "$UPDATE_DIR"/rbo_worker-linux-amd64-0.0.2-20240914-4ec80a8/rbo_worker "$UPDATE_DIR"/rbo_worker
+
+    # 清理不必要的文件
+    echo "清理临时文件..."
+    rm rbo_worker-linux-amd64-0.0.2-20240914-4ec80a8.tar.gz
+
+    # 向现有的 screen 会话发送命令
+    echo "向 Rainbow 会话发送命令..."
+    screen -S Rainbow -X stuff $'cd /root/rbo_indexer_testnet && nohup ./rbo_worker worker --rpc http://127.0.0.1:5000 --password demo --username demo --start_height 42000 --indexer_port 5050 > worker.log 2>&1 &\n'
+
+    echo "rbo_worker 更新和监控重启完成。"
+
+    read -n 1 -s -r -p "按任意键返回主菜单..."
+    main_menu
+}
+
 # 停止并删除脚本相关内容的函数
 function cleanup_and_remove_script() {
     echo "停止并删除脚本相关 Docker 容器..."
@@ -220,8 +259,9 @@ function main_menu() {
         echo "1. 安装并启动节点"
         echo "2. 连接 Bitcoin Core 并运行索引器"
         echo "3. 获取 Principal ID"
-        echo "4. 停止并删除节点"
-        read -p "请输入选项 [1-4]: " option
+        echo "4. 更新脚本"
+        echo "5. 停止并删除节点"
+        read -p "请输入选项 [1-5]: " option
         case $option in
             1)
                 install_and_start_node
@@ -233,10 +273,13 @@ function main_menu() {
                 edit_principal
                 ;;
             4)
+                update_script
+                ;;
+            5)
                 cleanup_and_remove_script
                 ;;
             *)
-                echo "无效的选项，请选择 [1-4]"
+                echo "无效的选项，请选择 [1-5]"
                 ;;
         esac
     done
