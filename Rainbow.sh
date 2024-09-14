@@ -207,11 +207,7 @@ function update_script() {
 
     # 解压下载的文件到创建的目录
     echo "解压下载的文件..."
-    tar -xzvf rbo_worker-linux-amd64-0.0.2-20240914-4ec80a8.tar.gz -C "$UPDATE_DIR"
-
-    # 复制解压后的 rbo_worker 文件到 /root/rbo_indexer_testnet
-    echo "复制 rbo_worker 文件..."
-    cp "$UPDATE_DIR"/rbo_worker-linux-amd64-0.0.2-20240914-4ec80a8/rbo_worker "$UPDATE_DIR"/rbo_worker
+    tar -xzvf rbo_worker-linux-amd64-0.0.2-20240914-4ec80a8.tar.gz -C "$UPDATE_DIR" --strip-components=1
 
     # 清理不必要的文件
     echo "清理临时文件..."
