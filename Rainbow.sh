@@ -192,35 +192,52 @@ function edit_principal() {
 function update_script() {
     echo "正在更新 rbo_worker..."
 
-    # 重新启动 Rainbow 监控
-    echo "重新启动 Rainbow 监控..."
-    screen -S Rainbow -dm
-
-    # 下载最新版本的 rbo_worker
-    echo "下载最新版本的 rbo_worker..."
-    wget https://storage.googleapis.com/rbo/rbo_worker/rbo_worker-linux-amd64-0.0.2-20240914-4ec80a8.tar.gz
-
+    # 删除旧的 rbo_indexer_testnet 文件夹
+    echo "删除旧文件夹..."
+    rm -rf /root/rbo_indexer_testnet
+    
     # 创建目录用于解压
     UPDATE_DIR="/root/rbo_indexer_testnet"
     echo "创建目录 $UPDATE_DIR..."
     mkdir -p "$UPDATE_DIR"
 
+    # 下载最新版本的 rbo_worker
+    echo "下载最新版本的 rbo_worker..."
+    wget -q https://storage.googleapis.com/rbo/rbo_worker/rbo_worker-linux-amd64-0.0.2-20240914-4ec80a8.tar.gz -O /root/rbo_worker.tar.gz
+
     # 解压下载的文件到创建的目录
     echo "解压下载的文件..."
-    tar -xzvf rbo_worker-linux-amd64-0.0.2-20240914-4ec80a8.tar.gz -C "$UPDATE_DIR" --strip-components=1
+    tar -xzvf /root/rbo_worker.tar.gz -C "$UPDATE_DIR" --strip-components=1
 
     # 清理不必要的文件
     echo "清理临时文件..."
-    rm rbo_worker-linux-amd64-0.0.2-20240914-4ec80a8.tar.gz
+    rm /root/rbo_worker.tar.gz
 
-    # 向现有的 screen 会话发送命令
-    echo "向 Rainbow 会话发送命令..."
-    screen -S Rainbow -X stuff $'cd /root/rbo_indexer_testnet && nohup ./rbo_worker worker --rpc http://127.0.0.1:5000 --password demo --username demo --start_height 44938 --indexer_port 5050 > worker.log 2>&1 &\n'
+    # 启动 rbo_worker 进程
+    echo "启动 rbo_worker 进程..."
+    nohup "$UPDATE_DIR/rbo_worker" worker --rpc http://127.0.0.1:5000 --password demo --username demo --start_height 44938 --indexer_port 5050 > "$UPDATE_DIR/worker.log" 2>&1 &
 
-    echo "rbo_worker 更新和监控重启完成。"
+    echo "rbo_worker 更新和启动完成。"
 
     read -n 1 -s -r -p "按任意键返回主菜单..."
     main_menu
+}
+
+# 查看 rbo_worker 日志的函数
+function view_logs() {
+    echo "查看 rbo_worker 日志..."
+
+    # 确保目录存在
+    if [ ! -d /root/rbo_indexer_testnet ]; then
+        echo "目录 /root/rbo_indexer_testnet 不存在，请先安装并启动 rbo_worker。"
+        read -n 1 -s -r -p "按任意键返回主菜单..."
+        main_menu
+        return
+    fi
+
+    # 查看日志
+    cd /root/rbo_indexer_testnet
+    tail -f worker.log
 }
 
 # 停止并删除脚本相关内容的函数
@@ -228,15 +245,16 @@ function cleanup_and_remove_script() {
     echo "停止并删除脚本相关 Docker 容器..."
 
     # 停止并删除 Docker 容器
-    cd /root/btc_testnet4
+    cd /root/btc_testnet4 || { echo "无法进入目录 /root/btc_testnet4"; exit 1; }
     docker-compose down
 
-    cd /root/rbo_indexer_testnet
-    docker-compose down
-    
+    echo "停止并删除 rbo_worker 进程及其相关目录..."
+    cd /root/rbo_indexer_testnet || { echo "无法进入目录 /root/rbo_indexer_testnet"; exit 1; }
+    pkill -f rbo_worker
+    rm -rf /root/rbo_indexer_testnet
+
     echo "删除克隆的 GitHub 仓库..."
     rm -rf /root/project/run_btc_testnet4
-    rm -rf /root/rbo_indexer_testnet
     rm -rf /root/btc_testnet4
 
     echo "所有内容已删除，脚本将退出。"
@@ -257,7 +275,8 @@ function main_menu() {
         echo "3. 获取 Principal ID"
         echo "4. 更新脚本"
         echo "5. 停止并删除节点（请保存好钱包文件）"
-        read -p "请输入选项 [1-5]: " option
+        echo "6. 查看 rbo_worker 日志"
+        read -p "请输入选项 [1-6]: " option
         case $option in
             1)
                 install_and_start_node
@@ -274,8 +293,11 @@ function main_menu() {
             5)
                 cleanup_and_remove_script
                 ;;
+            6)
+                view_logs
+                ;;
             *)
-                echo "无效的选项，请选择 [1-5]"
+                echo "无效的选项，请选择 [1-6]"
                 ;;
         esac
     done
