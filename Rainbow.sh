@@ -260,7 +260,7 @@ function main_menu() {
         echo "2. 连接 Bitcoin Core 并运行索引器"
         echo "3. 获取 Principal ID"
         echo "4. 更新脚本"
-        echo "5. 停止并删除节点"
+        echo "5. 停止并删除节点（请保存好钱包文件）"
         read -p "请输入选项 [1-5]: " option
         case $option in
             1)
