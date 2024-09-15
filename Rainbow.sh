@@ -245,10 +245,7 @@ function cleanup_and_remove_script() {
     exit 0
 }
 
-# 获取 Principal ID 的函数
 function edit_principal() {
-    echo "获取 /root/rbo_indexer_testnet/identity/identity.json 中的 Principal ID..."
-
     # 检查 identity.json 文件是否存在
     if [ ! -f /root/rbo_indexer_testnet/identity/identity.json ]; then
         echo "文件 /root/rbo_indexer_testnet/identity/identity.json 不存在，请先确保节点已正确启动并生成该文件。"
@@ -257,11 +254,8 @@ function edit_principal() {
     fi
 
     # 提取并展示字段 principal
-    echo "提取文件内容..."
     principal=$(grep '"principal"' /root/rbo_indexer_testnet/identity/identity.json | awk -F: '{gsub(/"|,/, "", $2); print $2}')
-
-    # 展示结果
-    echo "principal: $principal"
+    echo "$principal"
 
     # 提示用户按任意键返回主菜单
     read -n 1 -s -r -p "按任意键返回主菜单..."
