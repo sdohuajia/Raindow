@@ -256,15 +256,11 @@ function edit_principal() {
         return
     fi
 
-    # 提取并展示字段 bitcoin_p2tr, bitcoin_wif_key, principal
+    # 提取并展示字段 principal
     echo "提取文件内容..."
-    bitcoin_p2tr=$(grep '"bitcoin_p2tr"' /root/rbo_indexer_testnet/identity/identity.json | awk -F: '{gsub(/"|,/, "", $2); print $2}')
-    bitcoin_wif_key=$(grep '"bitcoin_wif_key"' /root/rbo_indexer_testnet/identity/identity.json | awk -F: '{gsub(/"|,/, "", $2); print $2}')
     principal=$(grep '"principal"' /root/rbo_indexer_testnet/identity/identity.json | awk -F: '{gsub(/"|,/, "", $2); print $2}')
 
     # 展示结果
-    echo "bitcoin_p2tr: $bitcoin_p2tr"
-    echo "bitcoin_wif_key: $bitcoin_wif_key"
     echo "principal: $principal"
 
     # 提示用户按任意键返回主菜单
